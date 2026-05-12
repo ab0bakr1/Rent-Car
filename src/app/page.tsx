@@ -1,0 +1,25 @@
+"use client";
+import Text from "@/components/atoms/Text";
+import Title from "@/components/atoms/Title";
+import { ThemeToggle } from "@/components/atoms/ThemeButton";
+import Box from "@/components/molecules/Box";
+import { dataBox } from "@/utils/data";
+import Images from "@/components/atoms/Images";
+import { hero } from "../../public/assets/images/images";
+import { Users, Sun } from "../../public/assets/icons/icons";
+import Icon from "@/components/atoms/Icon";
+import PublicLayout from "@/components/layout/PublicLayout";
+import useReveal from "@/animations/Reveal";
+import Floating from "@/animations/floating";
+import Hero from "@/components/organisms/Hero";
+export default function Page() {
+  useReveal(".Reveal-Section");
+  return (
+    <div>
+      <PublicLayout>
+        
+        <Hero />
+      </PublicLayout>
+    </div>
+  );
+}
