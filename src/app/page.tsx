@@ -12,6 +12,9 @@ import PublicLayout from "@/components/layout/PublicLayout";
 import useReveal from "@/animations/Reveal";
 import Floating from "@/animations/floating";
 import Hero from "@/components/organisms/Hero";
+import Special from "@/components/organisms/Special";
+import WhyUs from "@/components/organisms/WhyUs";
+
 export default function Page() {
   useReveal(".Reveal-Section");
   return (
@@ -19,6 +22,8 @@ export default function Page() {
       <PublicLayout>
         
         <Hero />
+        <Special />
+        <WhyUs />
       </PublicLayout>
     </div>
   );
