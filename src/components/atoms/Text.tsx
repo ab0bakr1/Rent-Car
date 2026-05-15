@@ -1,7 +1,7 @@
 import { cn } from "@/lib/cn";
 interface Props {
   children?: React.ReactNode;
-  size?: "sm" | "md" | "lg";
+  size?: "sm" | "md" | "lg" | "xl";
   center?: boolean;
   variant?: "primary" | "secondary" | "tertairy" | "disabled";
   className?: string;
@@ -18,6 +18,7 @@ export default function Text({
     sm: "ds-text-sm",
     md: "ds-text-base",
     lg: "ds-text-lg",
+    xl: "ds-text-xl",
   };
   const variants = {
     primary: "ds-text-primary",

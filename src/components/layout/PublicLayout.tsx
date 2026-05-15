@@ -10,7 +10,6 @@ export default function PublicLayout({ children }: Props) {
     <div>
       <Navbar />
       <main>{children}</main>
-      <ThemeToggle />
       <Footer />
     </div>
   );

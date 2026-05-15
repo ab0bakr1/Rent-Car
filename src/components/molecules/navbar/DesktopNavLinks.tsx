@@ -14,7 +14,7 @@ interface DesktopNavLinksProps {
 }
 export default function DesktopNavLinks({ mainRoutes }: DesktopNavLinksProps) {
   return (
-    <ul className="text-light hidden items-center gap-6 text-base font-medium md:flex">
+    <ul className="hidden items-center gap-8 md:flex">
       {mainRoutes.map((item) => (
         <li key={item.id}>
           <NavLink to={item.path}>{item.key}</NavLink>

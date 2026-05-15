@@ -22,7 +22,7 @@ export default function Card({name , price , image , seats , gear , type}:Props)
                     <Title variant="primary" size="md" >
                         {name}
                     </Title>
-                    <Title variant="tertairy" size="md" className="relative">
+                    <Title variant="disabled" size="md" className="relative">
                         ${price} <span className="ds-text-alt absolute top-8 left-0 ds-text-sm">/DAY</span>
                     </Title>
                 </div>

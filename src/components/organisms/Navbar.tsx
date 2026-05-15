@@ -1,14 +1,15 @@
-"use client";
 import { useEffect, useState } from "react";
-import { ListMinus } from "../../../public/assets/icons/icons";
 import { Routes } from "@/utils/routes";
-import { cn } from "../../lib/cn";
-import NavLogo from "../atoms/navbar/NavLogo";
-import NavIconButton from "../atoms/navbar/NavIconButton";
 import DesktopNavLinks from "../molecules/navbar/DesktopNavLinks";
 import MobileNavHeader from "../molecules/navbar/MobileNavHeader";
 import MobileNavLinks from "../molecules/navbar/MobileNavLinks";
 import Button from "../atoms/Button";
+import NavIconButton from "../atoms/navbar/NavIconButton";
+import { ListMinus } from "../../../public/assets/icons/icons";
+import NavLogo from "../atoms/navbar/NavLogo";
+import { cn } from "../../lib/cn";
+import { ThemeToggle } from "../atoms/ThemeButton";
+
 export default function Navbar() {
   const [open, setOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -29,14 +30,18 @@ export default function Navbar() {
   };
 
   return (
-    <nav
-      className={
-        (cn("fixed top-0 z-50 h-20 ds-container transition-all duration-300 "),
-        isScrolled ? "ds-bg  shadow-md" : "ds-bg shadow-sm")
-      }
-    >
-      <div className="mx-auto flex items-center justify-between py-2 sm:px-10 md:px-0 md:py-4 ds-container">
-        <NavLogo />
+    <div className="fixed top-0 z-50 flex w-full justify-center px-4 pt-4 md:px-8">
+      <nav
+        className={cn(
+          "flex w-full items-center justify-between transition-all duration-500 ease-in-out",
+          isScrolled
+            ? "h-16 max-w-7xl rounded-full border border-gray-200/50 bg-white/70 px-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)] backdrop-blur-md dark:border-gray-800/50 dark:bg-gray-900/70 dark:shadow-[0_8px_30px_rgb(0,0,0,0.1)]"
+            : "h-20 max-w-7xl bg-transparent px-2"
+        )}
+      >
+        {/* Desktop */}
+        <div className="hidden w-full items-center justify-between md:flex">
+          <NavLogo />
 
         <DesktopNavLinks
           mainRoutes={mainRoutes}
@@ -46,21 +51,28 @@ export default function Navbar() {
           closeNavbar={closeNavbar}
         />
 
-        <div className="hidden md:block ">
+        <div className="flex items-center gap-4">
           <Button size="md">login</Button>
+          <ThemeToggle />
         </div>
-        <div className="md:hidden">
-          <NavIconButton onClick={() => setOpen(true)}>
-            <ListMinus size={30} />
-          </NavIconButton>
         </div>
-      </div>
 
-      {/* Mobile */}
+        {/* Mobile */}
+        <div className="flex w-full items-center justify-between md:hidden">
+          <NavLogo />
+          <div className="flex items-center gap-3">
+            <ThemeToggle />
+            <NavIconButton onClick={() => setOpen(true)}>
+              <ListMinus size={24} />
+            </NavIconButton>
+          </div>
+        </div>
+      </nav>
+
       <div
         className={cn(
-          "ds-bg fixed top-0 right-0 z-40 h-screen w-full transition-transform duration-300 md:hidden",
-          open ? "translate-x-0" : "translate-x-full",
+          "fixed inset-0 z-50 h-screen w-full bg-white/95 backdrop-blur-lg transition-transform duration-500 ease-in-out dark:bg-gray-900/95 md:hidden",
+          open ? "translate-x-0" : "translate-x-full"
         )}
       >
         <MobileNavHeader onClose={closeNavbar} />
@@ -72,6 +84,6 @@ export default function Navbar() {
           closeNavbar={closeNavbar}
         />
       </div>
-    </nav>
+    </div>
   );
 }

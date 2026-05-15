@@ -14,6 +14,8 @@ import Floating from "@/animations/floating";
 import Hero from "@/components/organisms/Hero";
 import Special from "@/components/organisms/Special";
 import WhyUs from "@/components/organisms/WhyUs";
+import Reviwes from "@/components/organisms/Reviews";
+import Contact from "@/components/organisms/Contact";
 
 export default function Page() {
   useReveal(".Reveal-Section");
@@ -24,6 +26,8 @@ export default function Page() {
         <Hero />
         <Special />
         <WhyUs />
+        <Reviwes />
+        <Contact />
       </PublicLayout>
     </div>
   );
