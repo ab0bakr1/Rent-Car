@@ -1,5 +1,6 @@
 import ThemeProvider from "./ThemeProvider";
 import { NextIntlClientProvider } from "next-intl";
+import ReactQueryProvider from "./ReactQueryProvider";
 
 interface Props {
   children: React.ReactNode;
@@ -7,7 +8,9 @@ interface Props {
 export default function AppProviders({ children }: Props) {
   return (
     <ThemeProvider>
-      <NextIntlClientProvider>{children}</NextIntlClientProvider>
+      <ReactQueryProvider>
+        <NextIntlClientProvider>{children}</NextIntlClientProvider>
+      </ReactQueryProvider>
     </ThemeProvider>
   );
 }

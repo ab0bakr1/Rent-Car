@@ -17,10 +17,10 @@ export default function Box({ title, text, IconComponent }: Props) {
     <div className="ds-bg p-8 ds-shadow-md ds-rounded-md w-45 lg:w-75 flex flex-col items-center justify-center gap-4">
       <Icon IconComponent={IconComponent} size={40} color="disabled" />
       <Title variant="primary" size={isMobile ? "sm" : "md"} center={true}>
-        {t(title)}
+        {title}
       </Title>
       <Text variant="disabled" size={"sm"} center={true}>
-        {t(text)}
+        {text}
       </Text>
     </div>
   );

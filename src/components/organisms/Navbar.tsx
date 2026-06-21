@@ -1,3 +1,5 @@
+"use client";
+
 import { useEffect, useState } from "react";
 import { Routes } from "@/utils/routes";
 import DesktopNavLinks from "../molecules/navbar/DesktopNavLinks";
@@ -9,11 +11,13 @@ import { ListMinus } from "../../../public/assets/icons/icons";
 import NavLogo from "../atoms/navbar/NavLogo";
 import { cn } from "../../lib/cn";
 import { ThemeToggle } from "../atoms/ThemeButton";
+import Link from "next/link";
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [user, setUser] = useState<{ firstName: string; lastName: string } | null>(null);
 
   const mainRoutes = Routes.filter((r) => r.id <= 3);
   const dropdownRoutes = Routes.filter((r) => r.id > 3);
@@ -21,6 +25,17 @@ export default function Navbar() {
   useEffect(() => {
     const onScroll = () => setIsScrolled(window.scrollY > 50);
     window.addEventListener("scroll", onScroll, { passive: true });
+    
+    // Check for logged in user
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) {
+      try {
+        setUser(JSON.parse(storedUser));
+      } catch (e) {
+        console.error("Failed to parse user from localStorage", e);
+      }
+    }
+    
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
@@ -30,7 +45,7 @@ export default function Navbar() {
   };
 
   return (
-    <div className="fixed top-0 z-50 flex w-full justify-center px-4 pt-4 md:px-8">
+    <div className="fixed top-0 z-80 flex w-full justify-center px-4 pt-4 md:px-8">
       <nav
         className={cn(
           "flex w-full items-center justify-between transition-all duration-500 ease-in-out",
@@ -52,7 +67,20 @@ export default function Navbar() {
         />
 
         <div className="flex items-center gap-4">
-          <Button size="md">login</Button>
+          {user ? (
+            <Link href="/Dashboard" className="flex items-center gap-3 cursor-pointer group">
+              <div className="w-10 h-10 rounded-full ds-bg-primary flex items-center justify-center text-white font-bold ds-shadow-sm group-hover:scale-105 transition-transform">
+                {user.firstName ? user.firstName[0].toUpperCase() : 'U'}
+              </div>
+              <span className="ds-text-primary font-medium hidden lg:block">
+                {user.firstName} {user.lastName}
+              </span>
+            </Link>
+          ) : (
+            <a href="/Register">
+              <Button size="md">Register</Button>
+            </a>
+          )}
           <ThemeToggle />
         </div>
         </div>
