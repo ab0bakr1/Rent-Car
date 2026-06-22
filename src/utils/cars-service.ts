@@ -137,13 +137,27 @@ export const updateCar = async (id: string, carData: Partial<CarFormData>): Prom
 
 export const addCar = async (carData: Omit<Car, 'id'>): Promise<Car> => {
   const payload = {
-    ...carData,
-    pricePerDay: Number(carData.pricePerDay),
+    name: carData.name,
+    model: carData.model,
     year: Number(carData.year),
+    pricePerDay: Number(carData.pricePerDay),
     seats: Number(carData.seats),
+    transmission: carData.transmission,
+    fuelType: carData.fuelType,
+    brandId: carData.brandId,
+    categoryId: carData.categoryId,
+    featuredImage: carData.image,   // image → featuredImage
+    status: carData.status,
+    isFeatured: carData.isFeatured ?? false,
   };
-  const response = await apiClient.post<ApiResponse<Car>>('/cars', payload);
-  return response.data.data;
+
+  try {
+    const response = await apiClient.post<ApiResponse<Car>>('/cars', payload);
+    return response.data.data;
+  } catch (err: any) {
+    console.error("Add car error:", JSON.stringify(err.response?.data, null, 2));
+    throw err;
+  }
 };
 
 export const deleteCar = async (id: string): Promise<void> => {
