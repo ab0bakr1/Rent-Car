@@ -2,11 +2,52 @@ import { apiClient } from '@/lib/api-client';
 
 // ─── Interfaces ───────────────────────────────────────────────────────────────
 
+export type CarStatus = 'AVAILABLE' | 'BOOKED' | 'MAINTENANCE' | 'INACTIVE';
+export type Transmission = 'AUTOMATIC' | 'MANUAL';
+export type FuelType = 'PETROL' | 'DIESEL' | 'ELECTRIC' | 'HYBRID';
+
+export interface CarBrand {
+  id: string;
+  name: string;
+}
+
+export interface CarCategory {
+  id: string;
+  name: string;
+}
+
 export interface Car {
   id: string;
   name: string;
+  model: string;
+  year: number;
   pricePerDay: number;
   image: string;
+  status: CarStatus;
+  transmission: Transmission;
+  fuelType: FuelType;
+  seats: number;
+  brand?: CarBrand;
+  brandId: string;
+  category?: CarCategory;
+  categoryId: string;
+  rating?: number;
+  isFeatured?: boolean;
+}
+
+export interface CarFormData {
+  name: string;
+  model: string;
+  year: number;
+  pricePerDay: number;
+  image: string;
+  status: CarStatus;
+  transmission: Transmission;
+  fuelType: FuelType;
+  seats: number;
+  brandId: string;
+  categoryId: string;
+  isFeatured?: boolean;
 }
 
 export interface DashboardStats {
@@ -69,9 +110,44 @@ export const fetchCars = async (): Promise<Car[]> => {
   return response.data.data;
 };
 
-export const addCar = async (carData: Omit<Car, 'id'>): Promise<Car> => {
-  const response = await apiClient.post<ApiResponse<Car>>('/cars', carData);
+export const fetchCarById = async (id: string): Promise<Car> => {
+  const response = await apiClient.get<ApiResponse<Car>>(`/cars/${id}`);
   return response.data.data;
+};
+
+export const updateCar = async (id: string, carData: Partial<CarFormData>): Promise<Car> => {
+  const payload = {
+    name: carData.name,
+    model: carData.model,
+    year: Number(carData.year),
+    pricePerDay: Number(carData.pricePerDay),
+    seats: Number(carData.seats),
+    status: carData.status,
+    transmission: carData.transmission,
+    fuelType: carData.fuelType,
+    featuredImage: carData.image,  // ← image → featuredImage
+    brandId: carData.brandId,
+    categoryId: carData.categoryId,
+    isFeatured: carData.isFeatured,
+  };
+
+  const response = await apiClient.patch<ApiResponse<Car>>(`/cars/${id}`, payload);
+  return response.data.data;
+};
+
+export const addCar = async (carData: Omit<Car, 'id'>): Promise<Car> => {
+  const payload = {
+    ...carData,
+    pricePerDay: Number(carData.pricePerDay),
+    year: Number(carData.year),
+    seats: Number(carData.seats),
+  };
+  const response = await apiClient.post<ApiResponse<Car>>('/cars', payload);
+  return response.data.data;
+};
+
+export const deleteCar = async (id: string): Promise<void> => {
+  await apiClient.delete(`/cars/${id}`);
 };
 
 // ─── Dashboard ────────────────────────────────────────────────────────────────
