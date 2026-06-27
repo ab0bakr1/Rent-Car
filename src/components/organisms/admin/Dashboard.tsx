@@ -1,6 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import CarModal from "@/components/organisms/admin/Modal/CarModal";
+import { addCar, type CarFormData, type Car } from "@/utils/cars-service";
+import { getBrands, type Brand } from "@/utils/brands-service";
+import { getCategories, type Category } from "@/utils/categories-service";
 import Title from "../../atoms/Title";
 import Text from "../../atoms/Text";
 import Link from "next/link";
@@ -16,6 +20,34 @@ export default function Dashboard() {
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [saving, setSaving] = useState(false);
+  const [brands, setBrands] = useState<Brand[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
+
+  const openAddModal = async () => {
+    try {
+      const [b, c] = await Promise.all([getBrands(), getCategories()]);
+      setBrands(b ?? []);
+      setCategories(c ?? []);
+    } catch {
+      setBrands([]);
+      setCategories([]);
+    }
+    setShowAddModal(true);
+  };
+  const handleAddCar = async (data: CarFormData): Promise<{ id: string } | void> => {
+    setSaving(true);
+    try {
+      const created = await addCar(data as Omit<Car, "id">);
+      setShowAddModal(false);
+      return { id: created.id };
+    } catch {
+      alert("فشل حفظ السيارة.");
+    } finally {
+      setSaving(false);
+    }
+  };
 
   useEffect(() => {
     const fetchStats = async () => {
@@ -139,13 +171,16 @@ export default function Dashboard() {
         إجراءات سريعة
       </h3>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <Link href="/AddCars" className="group block p-6 rounded-2xl border-2 border-dashed border-gray-300 dark:border-gray-700 hover:border-blue-500 hover:bg-blue-50/50 dark:hover:bg-blue-900/10 transition-all text-center">
+        <button
+          onClick={openAddModal}
+          className="group block w-full p-6 rounded-2xl border-2 border-dashed border-gray-300 dark:border-gray-700 hover:border-blue-500 hover:bg-blue-50/50 dark:hover:bg-blue-900/10 transition-all text-center"
+        >
           <div className="w-16 h-16 mx-auto rounded-full bg-gray-100 dark:bg-gray-800 group-hover:bg-blue-100 dark:group-hover:bg-blue-900/30 flex items-center justify-center text-gray-500 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors mb-4">
             <PlusCircle size={32} />
           </div>
           <h4 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">إضافة سيارة جديدة</h4>
           <p className="text-gray-500 dark:text-gray-400">قم بإضافة وتوثيق سيارات جديدة إلى الأسطول.</p>
-        </Link>
+        </button>
 
         <Link href="/Staff" className="group block p-6 rounded-2xl border-2 border-dashed border-gray-300 dark:border-gray-700 hover:border-purple-500 hover:bg-purple-50/50 dark:hover:bg-purple-900/10 transition-all text-center">
           <div className="w-16 h-16 mx-auto rounded-full bg-gray-100 dark:bg-gray-800 group-hover:bg-purple-100 dark:group-hover:bg-purple-900/30 flex items-center justify-center text-gray-500 group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors mb-4">
@@ -170,7 +205,15 @@ export default function Dashboard() {
         <QuickLink href="/CouponsPage" label="الكوبونات" icon={<Banknote size={20} />} />
         <QuickLink href="/NotificationsPage" label="الإشعارات" icon={<Star size={20} />} />
       </div>
-
+      <CarModal
+        mode={showAddModal ? "add" : null}
+        car={null}
+        brands={brands}
+        categories={categories}
+        isLoading={saving}
+        onClose={() => setShowAddModal(false)}
+        onSubmit={handleAddCar}
+      />
     </div>
   );
 }

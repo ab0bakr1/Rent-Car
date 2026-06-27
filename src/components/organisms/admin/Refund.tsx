@@ -164,8 +164,8 @@ export default function AdminPaymentsPage() {
                       </p>
                     </div>
                     <StatusBadge
-                      label={STATUS_CONFIG[payment.status].label}
-                      color={STATUS_CONFIG[payment.status].color}
+                      label={STATUS_CONFIG[payment.status]?.label ?? payment.status}
+                      color={STATUS_CONFIG[payment.status]?.color ?? "gray"}
                     />
                   </div>
 

@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback, useMemo } from "react";
 import ConfirmDialog from "@/components/molecules/Confirmdialog";
 import StatusBadge from "@/components/molecules/Statusbadge";
-import  EmptyState from "@/components/molecules/Emptystate";
+import EmptyState from "@/components/molecules/Emptystate";
 import CarModal, { type CarModalMode } from "@/components/organisms/admin/Modal/CarModal";
 import Title from "@/components/atoms/Title";
 import Text from "@/components/atoms/Text";
@@ -106,18 +106,23 @@ export default function AdminCarsPage() {
     });
   }, [cars, search, statusFilter, brandFilter]);
 
-  const handleSubmit = async (data: CarFormData) => {
+  // ── handleSubmit يُعيد السيارة المنشأة ليتمكن المودال من رفع الصور ────
+  const handleSubmit = async (data: CarFormData): Promise<{ id: string } | void> => {
     setSaving(true);
     try {
       if (modalMode === "add") {
         const created = await addCar(data as Omit<Car, "id">);
         setCars((prev) => [created, ...prev]);
+        setModalMode(null);
+        setActiveCar(null);
+        // نُعيد السيارة المنشأة ليستخدم المودال الـ id في رفع الصور
+        return { id: created.id };
       } else if (modalMode === "edit" && activeCar) {
         const updated = await updateCar(activeCar.id, data);
         setCars((prev) => prev.map((c) => (c.id === activeCar.id ? updated : c)));
+        setModalMode(null);
+        setActiveCar(null);
       }
-      setModalMode(null);
-      setActiveCar(null);
     } catch (err) {
       console.error(err);
       alert("فشل حفظ السيارة.");
@@ -165,7 +170,10 @@ export default function AdminCarsPage() {
         {/* الفلاتر */}
         <div className="flex flex-col sm:flex-row gap-3 mb-6">
           <div className="relative flex-1">
-            <Search className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
+            <Search
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400"
+              size={18}
+            />
             <input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
@@ -225,7 +233,11 @@ export default function AdminCarsPage() {
                 <div className="relative h-40 bg-gray-100 dark:bg-gray-800">
                   {car.image ? (
                     // eslint-disable-next-line @next/next/no-img-element
-                    <img src={car.image} alt={car.name} className="w-full h-full object-cover" />
+                    <img
+                      src={car.image}
+                      alt={car.name}
+                      className="w-full h-full object-cover"
+                    />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center text-gray-300">
                       <CarFront size={40} />
@@ -246,15 +258,15 @@ export default function AdminCarsPage() {
                 </div>
 
                 <div className="p-4">
-                  <div className="flex items-start justify-between mb-2">
-                    <div>
-                      <p className="font-bold text-gray-900 dark:text-white">{car.name}</p>
-                      <p className="text-xs text-gray-400">
-                        {car.brand?.name ?? brands.find((b) => b.id === car.brandId)?.name ?? ""}
-                        {" · "}
-                        {car.model} {car.year ? `(${car.year})` : ""}
-                      </p>
-                    </div>
+                  <div className="mb-2">
+                    <p className="font-bold text-gray-900 dark:text-white">{car.name}</p>
+                    <p className="text-xs text-gray-400">
+                      {car.brand?.name ??
+                        brands.find((b) => b.id === car.brandId)?.name ??
+                        ""}
+                      {" · "}
+                      {car.model} {car.year ? `(${car.year})` : ""}
+                    </p>
                   </div>
 
                   <div className="flex items-center gap-3 text-xs text-gray-500 dark:text-gray-400 mb-3">
