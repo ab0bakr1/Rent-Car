@@ -17,7 +17,7 @@ export default function Navbar() {
   const [open, setOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
-  const [user, setUser] = useState<{ firstName: string; lastName: string } | null>(null);
+  const [user, setUser] = useState<{ firstName: string; lastName: string; role: string } | null>(null);
 
   const mainRoutes = Routes.filter((r) => r.id <= 3);
   const dropdownRoutes = Routes.filter((r) => r.id > 3);
@@ -68,7 +68,7 @@ export default function Navbar() {
 
         <div className="flex items-center gap-4">
           {user ? (
-            <Link href="/Dashboard" className="flex items-center gap-3 cursor-pointer group">
+            <Link {...(user?.role == 'ADMIN' ? { href: '/Dashboard' } : { href: '/profile' })} className="flex items-center gap-3 cursor-pointer group">
               <div className="w-10 h-10 rounded-full ds-bg-primary flex items-center justify-center text-white font-bold ds-shadow-sm group-hover:scale-105 transition-transform">
                 {user.firstName ? user.firstName[0].toUpperCase() : 'U'}
               </div>

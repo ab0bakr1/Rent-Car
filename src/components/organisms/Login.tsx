@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { apiClient } from "@/lib/api-client";
+import apiClient from "@/lib/api-client";
 import Text from "../atoms/Text";
 import Title from "../atoms/Title";
 import Button from "../atoms/Button";

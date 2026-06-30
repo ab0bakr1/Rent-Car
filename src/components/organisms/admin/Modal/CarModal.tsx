@@ -10,7 +10,7 @@ import type {
 } from "@/utils/cars-service";
 import type { Brand } from "@/utils/brands-service";
 import type { Category } from "@/utils/categories-service";
-import { apiClient } from "@/lib/api-client";
+import apiClient from "@/lib/api-client";
 import {
   X,
   Upload,

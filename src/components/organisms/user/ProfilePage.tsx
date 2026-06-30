@@ -5,7 +5,8 @@
 // ============================================================
 "use client";
 
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
+import { getPath } from "@/utils/routes";
 import {
   Camera, Shield, Lock, Smartphone, Upload, CheckCircle2, AlertCircle
 } from "lucide-react";
@@ -27,16 +28,19 @@ export function ProfilePage() {
   const uploadAvatar  = useUploadAvatar();
   const uploadLicense = useUploadLicense();
 
-  // Form state — يُملأ من البيانات المحملة
+  // Form state
   const [fullName, setFullName] = useState("");
   const [phone, setPhone]       = useState("");
   const [saved, setSaved]       = useState(false);
 
-  // تعبئة الـ form عند أول تحميل
-  if (profile && !fullName && !phone) {
-    setFullName(profile.fullName);
-    setPhone(profile.phone);
-  }
+  // ✅ useEffect بدل if داخل render — يعمل مرة واحدة عند تحميل البيانات
+  useEffect(() => {
+    if (profile && !fullName) {
+      setFullName(profile.fullName ?? "");
+      setPhone(profile.phone ?? "");
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [profile?.fullName, profile?.phone]);
 
   async function handleSave() {
     await updateProfile.mutateAsync({ fullName, phone });
@@ -80,7 +84,7 @@ export function ProfilePage() {
                     />
                   ) : (
                     <span className="text-2xl font-bold text-blue-600 dark:text-blue-400">
-                      {profile.fullName.charAt(0)}
+                      {(profile?.fullName ?? "م").charAt(0)}
                     </span>
                   )}
                 </div>
@@ -132,7 +136,7 @@ export function ProfilePage() {
                 </label>
                 <input
                   type="text"
-                  value={fullName}
+                  value={fullName ?? ""}
                   onChange={(e) => setFullName(e.target.value)}
                   className="w-full h-10 px-3 rounded-xl border border-gray-200 dark:border-gray-700 
                              bg-white dark:bg-gray-800 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -156,7 +160,7 @@ export function ProfilePage() {
                 </label>
                 <input
                   type="tel"
-                  value={phone}
+                  value={phone ?? ""}
                   onChange={(e) => setPhone(e.target.value)}
                   dir="ltr"
                   className="w-full h-10 px-3 rounded-xl border border-gray-200 dark:border-gray-700 
@@ -255,7 +259,7 @@ export function ProfilePage() {
               }
             />
             <button
-              onClick={() => window.location.href = "/loyalty"}
+              onClick={() => window.location.href = getPath("Loyalty")}
               className="mt-3 w-full h-9 rounded-xl border border-gray-200 dark:border-gray-700 
                          text-sm text-gray-600 dark:text-gray-300 hover:border-blue-400 transition-colors"
             >

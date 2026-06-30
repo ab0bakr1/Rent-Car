@@ -87,7 +87,7 @@ export const PublicPaths: string[] = [
 
 // مسارات تحتاج تسجيل دخول (أي role)
 export const UserProtectedRoutes: string[] = [
-  "/cars", "/bookings", "/favorites",
+  "/bookings", "/favorites",
   "/profile", "/notifications", "/payments", "/loyalty",
 ];
 

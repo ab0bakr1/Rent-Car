@@ -1,4 +1,4 @@
-import { apiClient } from "@/lib/api-client";
+import apiClient from "@/lib/api-client";
 import type { PaginatedResponse } from "./bookings-service";
 
 export type PaymentStatus = "PENDING" | "PAID" | "FAILED" | "REFUNDED" | "PARTIALLY_REFUNDED";

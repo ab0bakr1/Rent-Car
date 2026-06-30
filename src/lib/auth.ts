@@ -1,4 +1,4 @@
-import { apiClient } from '@/lib/api-client';
+import apiClient from '@/lib/api-client';
 
 export const verifyEmail = (token: string) =>
   apiClient.post('/auth/verify-email', { token });

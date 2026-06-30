@@ -62,9 +62,17 @@ export function CarCard({
     toggleFav.mutate({ carId: car.id, isFav: isFavorite });
   }
 
+  // ─── استخدم الـ slug فقط إذا كان هو نفس الـ ID (UUID)
+  // إذا كان slug مختلف (مثل "tahw-2026-db8b58c4") استخدم الـ ID الحقيقي
+  // لأن الـ backend يقبل UUID الكامل فقط
+  const isSlugSameAsId = car.slug === car.id;
+  const carPath = isSlugSameAsId || !car.slug
+    ? `/cars/${car.id}`       // UUID الحقيقي
+    : `/cars/${car.slug}`;    // slug (إذا كان الـ backend يدعمه)
+
   return (
     <article
-      onClick={() => router.push(`/cars/${car.slug}`)}
+      onClick={() => router.push(carPath)}
       className="group rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-gray-900
                  overflow-hidden cursor-pointer transition-all duration-200
                  hover:border-blue-200 dark:hover:border-blue-800 hover:shadow-md"

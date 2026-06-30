@@ -73,7 +73,7 @@ export function CarDetailPage({ idOrSlug }: { idOrSlug: string }) {
   const { go, goBack, href } = useNav();
   const [activeImg, setActiveImg] = useState(0);
 
-  const { data: car, isLoading } = useCar(idOrSlug);
+  const { data: car, isLoading, isError, error } = useCar(idOrSlug);
   const { data: reviews } = useCarReviews(idOrSlug);
   const { data: similar } = useSimilarCars(idOrSlug);
   const { data: favorites } = useFavorites();
@@ -81,7 +81,32 @@ export function CarDetailPage({ idOrSlug }: { idOrSlug: string }) {
 
   const isFav = favorites?.some((f) => f.id === car?.id) ?? false;
 
-  if (isLoading || !car) return <CarDetailSkeleton />;
+  // debug في development
+  if (process.env.NODE_ENV === "development" && (isError || (!isLoading && !car))) {
+    console.error("[CarDetailPage] فشل تحميل السيارة:", { idOrSlug, error, car });
+  }
+
+  if (isLoading) return <CarDetailSkeleton />;
+
+  if (isError || !car) {
+    return (
+      <div className="text-center py-20">
+        <p className="text-4xl mb-3">🚗</p>
+        <p className="text-gray-600 dark:text-gray-400 font-medium mb-1">
+          تعذّر تحميل بيانات السيارة
+        </p>
+        <p className="text-sm text-gray-400 mb-4">
+          ID: <code className="bg-gray-100 dark:bg-gray-800 px-2 py-0.5 rounded">{idOrSlug}</code>
+        </p>
+        <button
+          onClick={() => window.location.reload()}
+          className="px-4 h-10 bg-blue-600 text-white text-sm rounded-xl hover:bg-blue-700"
+        >
+          إعادة المحاولة
+        </button>
+      </div>
+    );
+  }
 
   // تطبيع البيانات القادمة من الـ API
   const validImages = getValidImages(car.images);
@@ -98,7 +123,7 @@ export function CarDetailPage({ idOrSlug }: { idOrSlug: string }) {
   const favIds = new Set(favorites?.map((f) => f.id) ?? []);
 
   return (
-    <div className="space-y-8">
+    <div className="mt-40 mb-20">
       {/* زر الرجوع */}
       <button
         onClick={() => goBack()}
@@ -275,16 +300,12 @@ export function CarDetailPage({ idOrSlug }: { idOrSlug: string }) {
             <div className="space-y-2">
               <button
                 onClick={() => {
-                  if (car.status === "available") {
-                    go("NewBooking");
-                  }
+                  router.push(getPath("NewBooking") + `?carId=${car.id}&slug=${car.slug}`);
                 }}
                 disabled={car.status !== "available"}
-                className={cn(
-                  "w-full h-11 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 ",
-                  "disabled:cursor-not-allowed text-white font-semibold rounded-xl transition-colors flex items-center",
-                  "justify-center gap-2"
-                )}
+                className="w-full h-11 bg-blue-600 hover:bg-blue-700 disabled:opacity-50
+                           disabled:cursor-not-allowed text-white font-semibold rounded-xl
+                           transition-colors flex items-center justify-center gap-2"
               >
                 <Calendar className="w-4 h-4" />
                 احجز الآن

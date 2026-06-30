@@ -1,23 +1,24 @@
 // ============================================================
 // src/app/(user)/bookings/[id]/page.tsx
-// Route: /bookings/[id] — تفاصيل الحجز
 // ============================================================
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import { BookingDetailPage } from "@/components/organisms/user/BookingDetailPage";
 
 interface Props {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { id } = await params;
   return {
-    title: `تفاصيل الحجز #${params.id.slice(-8).toUpperCase()} | RentCar`,
+    title: `تفاصيل الحجز #${id.slice(-8).toUpperCase()} | RentCar`,
     description: "تفاصيل الحجز والدفع والتقييم",
   };
 }
 
-export default function BookingDetailRoute({ params }: Props) {
+export default async function BookingDetailRoute({ params }: Props) {
+  const { id } = await params;
   return (
     <Suspense
       fallback={
@@ -33,7 +34,7 @@ export default function BookingDetailRoute({ params }: Props) {
         </div>
       }
     >
-      <BookingDetailPage bookingId={params.id} />
+      <BookingDetailPage bookingId={id} />
     </Suspense>
   );
 }

@@ -51,14 +51,57 @@ export function useCars(filters: CarsFilters = {}) {
     queryKey: userKeys.cars(filters),
     queryFn: () => carsService.getAll(filters),
     staleTime: 1000 * 60 * 2, // 2 دقيقة
+    retry: 1,
   });
 }
 
 export function useCar(idOrSlug: string) {
+  const qc = useQueryClient();
+
   return useQuery({
     queryKey: userKeys.car(idOrSlug),
-    queryFn: () => carsService.getOne(idOrSlug),
-    enabled: !!idOrSlug,
+    queryFn: async () => {
+      // ─── 1: ابحث في الـ cache من صفحة /cars ─────────────────
+      // slug "tahw-2026-db8b58c4" ← الـ backend يتوقع UUID الكامل
+      // نجيب الـ car من الـ cache ونستخرج ID الحقيقي منه
+      const allCaches = qc.getQueriesData<any>({ queryKey: ["cars"] });
+      const shortId   = idOrSlug.split("-").slice(-1)[0]; // "db8b58c4"
+
+      for (const [, cached] of allCaches) {
+        if (!cached) continue;
+        const items: any[] = Array.isArray(cached)
+          ? cached
+          : Array.isArray(cached?.data)
+          ? cached.data
+          : [];
+
+        const found = items.find((car: any) =>
+          car.slug === idOrSlug       ||
+          car.id   === idOrSlug       ||
+          car._id  === idOrSlug       ||
+          String(car.id  ?? "").includes(shortId) ||
+          String(car._id ?? "").includes(shortId) ||
+          String(car.slug ?? "").includes(shortId)
+        );
+
+        if (found) {
+          const realId = found.id ?? found._id;
+          console.log("[useCar] ✅ found in cache — real ID:", realId);
+          // إذا الـ ID الحقيقي مختلف عن الـ slug → أعد الجلب بالـ ID الصحيح
+          if (realId && realId !== idOrSlug) {
+            return carsService.getOne(realId);
+          }
+          return found;
+        }
+      }
+
+      // ─── 2: جرب الـ API مباشرة ────────────────────────────────
+      console.log("[useCar] not in cache, calling API with:", idOrSlug);
+      return carsService.getOne(idOrSlug);
+    },
+    enabled: !!idOrSlug && idOrSlug !== "undefined",
+    retry: 1,
+    staleTime: 1000 * 60 * 5,
   });
 }
 
@@ -162,6 +205,8 @@ export function useProfile() {
     queryKey: userKeys.profile,
     queryFn: profileService.get,
     staleTime: 1000 * 60 * 5,
+    gcTime:    1000 * 60 * 15,
+    retry: 1,
   });
 }
 
@@ -194,7 +239,8 @@ export function useNotifications() {
   return useQuery({
     queryKey: userKeys.notifications,
     queryFn: notificationsService.getAll,
-    refetchInterval: 1000 * 30, // كل 30 ثانية
+    refetchInterval: 1000 * 60, // كل دقيقة (بدل 30 ثانية)
+    retry: 1,
   });
 }
 
@@ -259,6 +305,9 @@ export function useLoyalty() {
   return useQuery({
     queryKey: userKeys.loyalty,
     queryFn: loyaltyService.getInfo,
+    retry: 1,                    // محاولة واحدة فقط بدل 3
+    staleTime: 1000 * 60 * 5,   // 5 دقائق — لا يعيد الجلب عند العودة للصفحة
+    gcTime:    1000 * 60 * 10,  // يحتفظ بالـ cache 10 دقائق
   });
 }
 
